@@ -15,27 +15,27 @@ content from property bundles.
 The solution: 
 ------------
 
- // Configuration Contract (with JSR 303 Annotations) 
- public interface ExampleConfig{
+    // Configuration Contract (with JSR 303 Annotations) 
+    public interface ExampleConfig{
     
-    @Config("dbUrl")
-    @NotNull
-    String getDbUrl();
+       @Config("dbUrl")
+       @NotNull
+       String getDbUrl();
     
     
-    @Config(value="connectTimeout", default="1000")
-    @Min(0)
-    int getConnectTimeout();
+       @Config(value="connectTimeout", default="1000")
+       @Min(0)
+       int getConnectTimeout();
  
- }
+    }
  
- // Load and validate the config 
- ConfigFactory cf = ConfigFactoryBuilder.newBuilder().withValidation().build();
+    // Load and validate the config 
+    ConfigFactory cf = ConfigFactoryBuilder.newBuilder().withValidation().build();
  
- ExampleConfig config = cf.fromFile("config.properties").bindConfig(ExampleConfig.class); 
+    ExampleConfig config = cf.fromFile("config.properties").bindConfig(ExampleConfig.class); 
  
  
- // use the config
- String dbUrl = config.getDbUrl();
+    // use the config
+    String dbUrl = config.getDbUrl();
  
    
