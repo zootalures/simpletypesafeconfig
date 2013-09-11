@@ -4,11 +4,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import com.sun.org.apache.xerces.internal.util.MessageFormatter;
 
-import java.io.IOException;
 import java.io.PrintStream;
-import java.io.StringReader;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -20,26 +17,26 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Factory for creating bound configuration instances
  */
-public class ConfigFactory {
+public class ConfigBinder {
     /**
      * Creates a property description from a specified method
      *
      * @param method
      * @return
      */
-    private PropertyDescription createDescriptionfromMethod(Method method) {
+    private PropertyDescription createDescriptionFromMethod(Method method) {
         String propertyName;
         String description;
         boolean required = true;
         String defaultValue;
         Class<?> type = method.getReturnType();
         if (!validPropertyType(type)) {
-            throw new InvalidPropertyProxyException("Method " + method
+            throw new InvalidConfigInterfaceException("Method " + method
                     + " has an invalid return type " + type
                     + " only primitive types and strings are supported");
         }
         if (method.getParameterTypes().length != 0) {
-            throw new InvalidPropertyProxyException(
+            throw new InvalidConfigInterfaceException(
                     "Method "
                             + method
                             + " has an invalid signature, only methods with empty signatures are supported");
@@ -63,7 +60,7 @@ public class ConfigFactory {
         }
 
         if (type.isPrimitive() && !required && defaultValue == null) {
-            throw new InvalidPropertiesException("property " + propertyName
+            throw new InvalidConfigException("property " + propertyName
                     + " is optional, has no default and has a primititve type ");
         }
 
@@ -107,11 +104,11 @@ public class ConfigFactory {
      * @param bundle
      *            the property bundle
      * @return a new interface of the properties object
-     * @throws InvalidPropertiesException
+     * @throws InvalidConfigException
      */
     @SuppressWarnings("unchecked")
     public <T> T bind(Class<T> type, final Properties bundle)
-            throws InvalidPropertiesException {
+            throws InvalidConfigException {
         checkNotNull(type, "type is required");
         checkNotNull(bundle, "bundle is required");
 
@@ -119,13 +116,13 @@ public class ConfigFactory {
 
         final Method getDescriptorsMethod;
         try {
-            getDescriptorsMethod = PropertyProxy.class
+            getDescriptorsMethod = ConfigProxy.class
                     .getMethod("getDescriptors");
         } catch (Exception e) {
             throw new RuntimeException("Failed to get descriptor method", e);
         }
         return (T) Proxy.newProxyInstance(getClass().getClassLoader(),
-                new Class[]{type, PropertyProxy.class},
+                new Class[]{type, ConfigProxy.class},
                 new InvocationHandler() {
                     public Object invoke(Object proxy, Method method,
                                          Object[] args) throws Throwable {
@@ -148,7 +145,7 @@ public class ConfigFactory {
                 new MethodVisitor() {
                     @Override
                     public void visitMethod(Class<?> type, Method m) {
-                        properties.put(m, createDescriptionfromMethod(m));
+                        properties.put(m, createDescriptionFromMethod(m));
                     }
                 });
         return properties;
@@ -162,12 +159,12 @@ public class ConfigFactory {
      * @return
      */
     private Object fetchPropertyValue(PropertyDescription desc,
-                                      Properties bundle) throws InvalidPropertiesException {
+                                      Properties bundle) throws InvalidConfigException {
 
         String property = desc.getProperty();
         String value = bundle.getProperty(property, desc.getDefaultValue());
         if (value == null && desc.isRequired()) {
-            throw new InvalidPropertiesException("Property "
+            throw new InvalidConfigException("Property "
                     + desc.getProperty() + " is required but not set");
         }
 
@@ -220,7 +217,7 @@ public class ConfigFactory {
                 try {
                     return Enum.valueOf(enumType, value);
                 } catch (Exception e) {
-                    throw new InvalidPropertiesException(String.format(
+                    throw new InvalidConfigException(String.format(
                             "Unsupported property value %s on property %s, valid values are [%s]",
                             value, property,
                             Joiner.on(",").join(enumType.getEnumConstants()))
@@ -230,7 +227,7 @@ public class ConfigFactory {
                 return null;
             }
         } else {
-            throw new InvalidPropertiesException("Unsupported return type "
+            throw new InvalidConfigException("Unsupported return type "
                     + targetType + " on property " + property);
         }
     }
@@ -242,10 +239,10 @@ public class ConfigFactory {
      * @param type
      * @param bundle
      * @return
-     * @throws InvalidPropertiesException
+     * @throws InvalidConfigException
      */
     public <T> T bindAndValidate(Class<T> type, final Properties bundle)
-            throws InvalidPropertiesException {
+            throws InvalidConfigException {
         checkNotNull(type, "type is required");
         checkNotNull(bundle, "bundle is required");
 
@@ -262,23 +259,23 @@ public class ConfigFactory {
     public <T> void validate(Class<T> type, final Properties bundle) {
         Map<Method, PropertyDescription> descs = extractDescriptors(type);
 
-        Map<PropertyDescription, InvalidPropertiesException> errors = new LinkedHashMap<PropertyDescription, InvalidPropertiesException>();
+        Map<PropertyDescription, InvalidConfigException> errors = new LinkedHashMap<PropertyDescription, InvalidConfigException>();
         for (PropertyDescription propDesc : descs.values()) {
             try {
                 fetchPropertyValue(propDesc, bundle);
-            } catch (InvalidPropertiesException ex) {
+            } catch (InvalidConfigException ex) {
                 errors.put(propDesc, ex);
             }
         }
         if (errors.size() > 0) {
             StringBuilder errorMsg = new StringBuilder();
             errorMsg.append("Invalid properties : ");
-            for (Map.Entry<PropertyDescription, InvalidPropertiesException> entry : errors
+            for (Map.Entry<PropertyDescription, InvalidConfigException> entry : errors
                     .entrySet()) {
                 errorMsg.append(String.format("{ %s : %s }", entry.getKey()
                         .getProperty(), entry.getValue().getMessage()));
             }
-            throw new InvalidPropertiesException(errorMsg.toString());
+            throw new InvalidConfigException(errorMsg.toString());
         }
     }
 

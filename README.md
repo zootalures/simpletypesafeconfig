@@ -15,6 +15,7 @@ content from property bundles.
 The solution: 
 ------------
 
+Config proxy:
     // Configuration Contract (with JSR 303 Annotations) 
     public interface ExampleConfig{
     
@@ -28,7 +29,13 @@ The solution:
        int getConnectTimeout();
  
     }
- 
+
+Sample Config File:
+    dbUrl=jdbc:mydb/test
+    connectTimeout=1000
+
+
+Config usage
     // Load and validate the config 
     ConfigFactory cf = ConfigFactoryBuilder.newBuilder().withValidation().build();
  

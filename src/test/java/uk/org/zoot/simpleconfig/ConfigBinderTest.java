@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 
-public class ConfigFactoryTest {
+public class ConfigBinderTest {
 
 
     static class PropertyBuilder {
@@ -28,7 +28,7 @@ public class ConfigFactoryTest {
         }
     }
 
-    ConfigFactory binder = new ConfigFactory();
+    ConfigBinder binder = new ConfigBinder();
 
     public interface InvalidRT {
         public Object property();
@@ -174,7 +174,7 @@ public class ConfigFactoryTest {
                             "SOMEOadsaTHERVALUE").build()).enumProperty();
 
             fail("should have thrown a binding exception");
-        } catch (InvalidPropertiesException e) {
+        } catch (InvalidConfigException e) {
             assertThat(e.getMessage(),
                     containsString("[GOODVALUE,OTHERGOODVALUE]"));
         }
@@ -195,12 +195,12 @@ public class ConfigFactoryTest {
             binder.bindAndValidate(InvalidRT.class,
                     new PropertyBuilder().build());
             fail("should have thrown a binding exception");
-        } catch (InvalidPropertyProxyException e) {
+        } catch (InvalidConfigInterfaceException e) {
             assertThat(e.getMessage(), containsString("return type"));
         }
     }
 
-    @Test(expected = InvalidPropertiesException.class)
+    @Test(expected = InvalidConfigException.class)
     public void shouldFailWhenRequiredValueNotBind() {
         SimpleProps props = binder.bind(SimpleProps.class,
                 new PropertyBuilder().build());
@@ -214,7 +214,7 @@ public class ConfigFactoryTest {
             binder.bindAndValidate(InvalidArgs.class,
                     new PropertyBuilder().build());
             fail("should have thrown a binding exception");
-        } catch (InvalidPropertyProxyException e) {
+        } catch (InvalidConfigInterfaceException e) {
             assertThat(e.getMessage(), containsString("signature"));
         }
     }
@@ -234,7 +234,7 @@ public class ConfigFactoryTest {
         try {
             binder.validate(SimpleProps.class, new PropertyBuilder().build());
             fail("should have failed validation");
-        } catch (InvalidPropertiesException e) {
+        } catch (InvalidConfigException e) {
             assertThat(
                     e.getMessage(),
                     containsString("{ myProp : Property myProp is required but not set }"));

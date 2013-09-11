@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Annotate an interface method to be bound to a property in a property file
  *
- * This is used in conjunction with a {@link ConfigFactory} and a target
+ * This is used in conjunction with a {@link ConfigBinder} and a target
  * configuration interface to wrap configuratino data from a property bundler in
  * a strongly typed java interface.
  *

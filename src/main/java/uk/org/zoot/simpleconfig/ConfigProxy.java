@@ -10,10 +10,10 @@ import java.util.Map;
  * @author cliffeo
  *
  */
-public interface PropertyProxy {
+public interface ConfigProxy {
     /**
      *
-     * @return
+     * @return a  map of methods to property descriptors
      */
     Map<Method, PropertyDescription> getDescriptors();
 }
