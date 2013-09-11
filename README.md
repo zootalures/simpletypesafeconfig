@@ -18,12 +18,12 @@ The solution:
     // Configuration Contract (with JSR 303 Annotations) 
     public interface ExampleConfig{
     
-       @Config("dbUrl")
+       @ConfigProperty("dbUrl",required=true)
        @NotNull
        String getDbUrl();
     
     
-       @Config(value="connectTimeout", default="1000")
+       @Config(value="connectTimeout", defaultValue="1000")
        @Min(0)
        int getConnectTimeout();
  
