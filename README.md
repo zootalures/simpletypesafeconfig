@@ -33,17 +33,18 @@ Config proxy:
     }
 
 Sample Config File:
+
     dbUrl=jdbc:mydb/test
     connectTimeout=1000
 
 
-Config usage
+Config usage: 
+
     // Load and validate the config 
     ConfigFactory cf = ConfigFactoryBuilder.newBuilder().withValidation().build();
- 
+     
     ExampleConfig config = cf.fromFile("config.properties").bindConfig(ExampleConfig.class); 
- 
- 
+    
     // use the config
     String dbUrl = config.getDbUrl();
  
