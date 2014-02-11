@@ -16,6 +16,8 @@ The solution:
 ------------
 
 Config proxy:
+
+
     // Configuration Contract (with JSR 303 Annotations) 
     public interface ExampleConfig{
     
