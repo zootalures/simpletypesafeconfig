@@ -16,33 +16,49 @@ The solution:
 ------------
 
 Config proxy:
-    // Configuration Contract (with JSR 303 Annotations) 
-    public interface ExampleConfig{
-    
+
+    // Configuration Contract (with JSR 303 Annotations)
+    public interface DBConfig{
        @ConfigProperty("dbUrl",required=true)
        @NotNull
        String getDbUrl();
     
     
-       @Config(value="connectTimeout", defaultValue="1000")
+       @ConfigProperty(value="connectTimeout", defaultValue="1000")
        @Min(0)
        int getConnectTimeout();
- 
+
+
+       public enum ConnectionFlags{
+          KEEP_ALIVE,
+          RECONNECT,
+          POOL_CONNECTIONS
+       };
+
+       @ConfigProperty(value="connectionFlags")
+       Set<ConnectionFlags> getConnectionFlags();
     }
 
 Sample Config File:
+
     dbUrl=jdbc:mydb/test
     connectTimeout=1000
-
+    multivalues=A,B,C,D
 
 Config usage
+
     // Load and validate the config 
-    ConfigFactory cf = ConfigFactoryBuilder.newBuilder().withValidation().build();
+    ConfigBinder binder = new ConfigBinder();
+
+    Properties p = new Properties();
+
+    p.load("config.properties");
  
-    ExampleConfig config = cf.fromFile("config.properties").bindConfig(ExampleConfig.class); 
+    ExampleConfig config = cf.bindExampleConfig.class);
  
- 
+
     // use the config
     String dbUrl = config.getDbUrl();
- 
+
+
    

@@ -64,7 +64,7 @@ public class ConfigBinder {
                     + " is optional, has no default and has a primititve type ");
         }
 
-        return new PropertyDescription(method, propertyName, description,
+        return new PropertyDescriptionImpl(method, propertyName, description,
                 required, type, defaultValue);
     }
 

@@ -307,4 +307,9 @@ public class ConfigBinderTest {
                         .build());
         assertArrayEquals(new String[] {}, props.arrayStringProperty());
     }
+
+
+    public void canLoadSetOfEnumProperties(){
+
+    }
 }

@@ -1,64 +1,24 @@
 package uk.org.zoot.simpleconfig;
 
+/**
+ * Created with IntelliJ IDEA.
+ * User: occ
+ * Date: 13/09/13
+ * Time: 08:25
+ * To change this template use File | Settings | File Templates.
+ */
+public interface PropertyDescription {
+    String getProperty();
 
-import com.google.common.base.Preconditions;
+    String getDescription();
 
-import java.lang.reflect.Method;
+    boolean isRequired();
 
-public class PropertyDescription {
-    PropertyDescription(Method readMethod, String property, String description,
-                        boolean required, Class<?> type, String	 defaultValue) {
-        super();
-        this.property = Preconditions.checkNotNull(property);
-        this.description = description;
-        this.required = required;
-        this.type = Preconditions.checkNotNull(type);
-        this.defaultValue = defaultValue;
-        this.readMethod = readMethod;
+    boolean isMultiValued();
 
-    }
+    Class<?> getType();
 
-    private final String property;
-    private final String description;
-    private final boolean required;
-    private final Class<?> type;
-    private final String defaultValue;
-    private final Method readMethod;
+    Class<?> getComponentType();
 
-    public String getProperty() {
-        return property;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public boolean isRequired() {
-        return required;
-    }
-
-
-    public boolean isMultiValued() {
-        return type.isArray();
-    }
-
-    public Class<?> getType() {
-        return type;
-    }
-
-    public Class<?> getComponentType() {
-        if (type.isArray()) {
-            return type.getComponentType();
-        } else {
-            return type;
-        }
-    }
-
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
-    public Method getReadMethod() {
-        return readMethod;
-    }
+    String getDefaultValue();
 }
