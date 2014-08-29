@@ -17,8 +17,10 @@ The solution:
 
 Config proxy:
 
-    // Configuration Contract (with JSR 303 Annotations)
-    public interface DBConfig{
+
+    // Configuration Contract (with JSR 303 Annotations) 
+    public interface ExampleConfig{
+    
        @ConfigProperty("dbUrl",required=true)
        @NotNull
        String getDbUrl();
