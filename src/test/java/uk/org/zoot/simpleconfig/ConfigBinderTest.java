@@ -1,13 +1,15 @@
 package uk.org.zoot.simpleconfig;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.Properties;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 
@@ -85,7 +87,12 @@ public class ConfigBinderTest {
 
         @ConfigProperty(value = "arrayStringProperty", required = false)
         public String[] arrayStringProperty();
-    }
+
+		public Set<SampleEnum> enumSetProps();
+
+		public List<String> stringListProps();
+
+	}
 
     @Test
     public void canLoadSimpleStringPropertyWithNoAnnotation() {
@@ -296,7 +303,7 @@ public class ConfigBinderTest {
         SimpleProps props = binder.bind(SimpleProps.class,
                 new PropertyBuilder().build());
 
-        assertNull("array prop should be null", props.arrayStringProperty());
+        assertThat(props.arrayStringProperty(), CoreMatchers.equalTo(new String[0]));
     }
 
     @Test()
@@ -308,8 +315,22 @@ public class ConfigBinderTest {
         assertArrayEquals(new String[] {}, props.arrayStringProperty());
     }
 
-
+	@Test
     public void canLoadSetOfEnumProperties(){
+		 SimpleProps props = binder.bind(SimpleProps.class,
+		new PropertyBuilder().withProperty("enumSetProps","GOODVALUE,OTHERGOODVALUE").build());
 
+		assertThat(props.enumSetProps(),equalTo((Set<SampleEnum>)EnumSet.of(SampleEnum.GOODVALUE, SampleEnum.OTHERGOODVALUE)));
     }
+
+
+	@Test
+	public void canLoadListOfStringProperties(){
+		SimpleProps props = binder.bind(SimpleProps.class,
+				new PropertyBuilder().withProperty("stringListProps","A,B").build());
+
+		assertThat(props.stringListProps(),equalTo(Arrays.asList("A","B")));
+	}
+
+
 }
